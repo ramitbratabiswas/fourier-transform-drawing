@@ -7,22 +7,20 @@ let path = [];
 
 function setup() {
   createCanvas(800, 600);
-  // const skip = 8;
-  // for (let i = 0; i < drawing.length; i += skip) {
-  //   x.push(drawing[i].x);
-  //   y.push(drawing[i].y);
-  // }
-
-  y = [100, 100, 100, 0, 0, 0, 100, 100, 100, 0, 0, 0, 100, 100, 100, 0, 0, 0, 100, 100, 100, 0, 0, 0]; 
+  const skip = 8;
+  for (let i = 0; i < drawing.length; i += skip) {
+    x.push(drawing[i].x);
+    y.push(drawing[i].y);
+  }
 
   fourierX = dft(x);
   fourierY = dft(y);
 
-  // fourierX.sort((a, b) => b.amp - a.amp);
-  // fourierY.sort((a, b) => b.amp - a.amp);
+  fourierX.sort((a, b) => b.amp - a.amp);
+  fourierY.sort((a, b) => b.amp - a.amp);
 }
 
-function epiCycles(x, y, rotation, fourier) {
+function epicycles(x, y, rotation, fourier) {
   for (let i = 0; i < fourier.length; i++) {
     let prevx = x;
     let prevy = y;
@@ -43,10 +41,14 @@ function epiCycles(x, y, rotation, fourier) {
 
 function draw() {
   background(0);
-  translate(150, 200);
+  
 
-  // let x = 0;
-
+  let vx = epicycles(width / 2 + 100, 100, 0, fourierX);
+  let vy = epicycles(100, height / 2 + 100, HALF_PI, fourierY);
+  let v = createVector(vx.x, vy.y);
+  path.unshift(v);
+  line(vx.x, vx.y, v.x, v.y);
+  line(vy.x, vy.y, v.x, v.y);
   
   beginShape();
   noFill();

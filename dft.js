@@ -18,7 +18,11 @@ function dft (x) {
     re /= N;
     im /= N;
 
-    fourier[k] = {re, im};
+    let freq = k;
+    let amp = sqrt(re**2 + im**2);
+    let phase = atan2(im, re);
+
+    fourier[k] = {re, im, freq, amp, phase}; 
     
   } 
   return fourier ;
