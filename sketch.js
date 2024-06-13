@@ -1,23 +1,18 @@
+const USER = 0;
+const FOURIER = 1;
+
 let x = [];
 let y = [];
 let fourierX;
 let fourierY;
 let time = 0;
 let path = [];
+let mouseArray = [];
+let state = 3;
 
 function setup() {
   createCanvas(800, 600);
-  const skip = 8;
-  for (let i = 0; i < drawing.length; i += skip) {
-    x.push(drawing[i].x);
-    y.push(drawing[i].y);
-  }
-
-  fourierX = dft(x);
-  fourierY = dft(y);
-
-  fourierX.sort((a, b) => b.amp - a.amp);
-  fourierY.sort((a, b) => b.amp - a.amp);
+  state = 3;
 }
 
 function epicycles(x, y, rotation, fourier) {
@@ -41,29 +36,66 @@ function epicycles(x, y, rotation, fourier) {
 
 function draw() {
   background(0);
-  
 
-  let vx = epicycles(width / 2 + 100, 100, 0, fourierX);
-  let vy = epicycles(100, height / 2 + 100, HALF_PI, fourierY);
-  let v = createVector(vx.x, vy.y);
-  path.unshift(v);
-  line(vx.x, vx.y, v.x, v.y);
-  line(vy.x, vy.y, v.x, v.y);
-  
-  beginShape();
-  noFill();
-  for (let i = 0; i < path.length; i++) {
-    vertex(path[i].x, path[i].y);
-  }
-  endShape();
+  if (state == USER) {
+    let point = createVector(mouseX - width/2, mouseY - height/2);
+    mouseArray.push(point);
 
-  const dt = TWO_PI / fourierY.length;
-  time += dt;
+    stroke(255);
+    noFill();
 
-  if (time > TWO_PI) {
-    time = 0;
-    path = [];
+    beginShape();
+    for (let v of mouseArray) {
+      vertex(v.x + width/2, v.y + height/2);
+    }
+    endShape();
+
+  } else if (state == FOURIER) {
+    let vx = epicycles(width / 2, 100, 0, fourierX);
+    let vy = epicycles(100, height / 2, HALF_PI, fourierY);
+    let v = createVector(vx.x, vy.y);
+    path.unshift(v);
+    line(vx.x, vx.y, v.x, v.y);
+    line(vy.x, vy.y, v.x, v.y);
+    
+    beginShape();
+    noFill();
+    for (let i = 0; i < path.length; i++) {
+      vertex(path[i].x, path[i].y);
+    }
+    endShape();
+
+    const dt = TWO_PI / fourierY.length;
+    time += dt;
+
+    if (time > TWO_PI) {
+      time = 0;
+      path = [];
+    }
   }
 
 }
 
+function mousePressed() {
+  state = USER;
+  mouseArray = [];
+  x = [];
+  y = [];
+  time = 0;
+  path = [];
+}
+
+function mouseReleased() {
+  state = FOURIER;
+  const skip = 1;
+  for (let i = 0; i < mouseArray.length; i += skip) {
+    x.push(mouseArray[i].x);
+    y.push(mouseArray[i].y);
+  }
+
+  fourierX = dft(x);
+  fourierY = dft(y);
+
+  fourierX.sort((a, b) => b.amp - a.amp);
+  fourierY.sort((a, b) => b.amp - a.amp);
+}
