@@ -10,8 +10,28 @@ let path = [];
 let mouseArray = [];
 let state = 3;
 
+function getWidth() {
+  return Math.max(
+    document.body.scrollWidth,
+    document.documentElement.scrollWidth,
+    document.body.offsetWidth,
+    document.documentElement.offsetWidth,
+    document.documentElement.clientWidth
+  );
+}
+
+function getHeight() {
+  return Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body.offsetHeight,
+    document.documentElement.offsetHeight,
+    document.documentElement.clientHeight
+  );
+}
+
 function setup() {
-  createCanvas(800, 600);
+  createCanvas(getWidth(), getHeight());
   state = 3;
 }
 
@@ -38,10 +58,12 @@ function draw() {
   background(0);
 
   if (state == USER) {
+
     let point = createVector(mouseX - width/2, mouseY - height/2);
     mouseArray.push(point);
 
     stroke(255);
+    strokeWeight(3);
     noFill();
 
     beginShape();
@@ -49,6 +71,8 @@ function draw() {
       vertex(v.x + width/2, v.y + height/2);
     }
     endShape();
+
+    strokeWeight(1);
 
   } else if (state == FOURIER) {
     let vx = epicycles(width / 2, 100, 0, fourierX);
@@ -58,12 +82,14 @@ function draw() {
     line(vx.x, vx.y, v.x, v.y);
     line(vy.x, vy.y, v.x, v.y);
     
+    strokeWeight(3);
     beginShape();
     noFill();
     for (let i = 0; i < path.length; i++) {
       vertex(path[i].x, path[i].y);
     }
     endShape();
+    strokeWeight(1);
 
     const dt = TWO_PI / fourierY.length;
     time += dt;
